@@ -40,7 +40,10 @@ function handleResize() {
     SIZE.y=(window.innerHeight - SIZE.height)/2;
 }
 function updateCanvas() {
+    CONTEXT.clearRect(0, 0, CANVAS.width, CANVAS.height);
+    CONTEXT.globalAlpha=0.5;
     CONTEXT.drawImage(VIDEO, SIZE.x, SIZE.y, SIZE.width, SIZE.height);
+    
     for(let i=0;i<PIECES.length;i++) {
         PIECES[i].draw(CONTEXT);
     }
@@ -56,6 +59,17 @@ function initializePieces(rows, columns) {
         for(let j=0;j<SIZE.columns;j++){
             PIECES.push(new Piece(i,j));
         }
+    }
+}
+
+function randomizePieces() {
+    for(let i=0;i<PIECES.length;i++) {
+    let loc={
+        x:Math.random()*(CANVAS.width-PIECES[i].width),
+        y:Math.random()*(CANVAS.height-PIECES[i].height),
+        }
+            PIECES[i].x=loc.x;
+            PIECES[i].y=loc.y;
     }
 }
 
