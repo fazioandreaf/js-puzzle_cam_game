@@ -1,9 +1,11 @@
 let VIDEO= null;
 let CANVAS= null;
 let CONTEXT= null;
-let SCALE=0.9;
+let SCALE= 0.9;
 let SIZE= {x:0,y:0,width:0,height:0, rows:3, columns:3};
 let PIECES= [];
+let START_TIME= null;
+let END_TIME= null;
 
 let SELECTED_PIECE=null;
 
@@ -23,7 +25,7 @@ function main() {
             handleResize();
             window.addEventListener('resize', handleResize);
             initializePieces(SIZE.rows, SIZE.columns);
-            updateCanvas();
+            updateGame();
         }
     })
     .catch((e)=> alert('Camera errore: ' + e))
@@ -39,7 +41,8 @@ function handleResize() {
     SIZE.x=(window.innerWidth - SIZE.width)/2;
     SIZE.y=(window.innerHeight - SIZE.height)/2;
 }
-function updateCanvas() {
+
+function updateGame() {
     CONTEXT.clearRect(0, 0, CANVAS.width, CANVAS.height);
     CONTEXT.globalAlpha=0.5;
     CONTEXT.drawImage(VIDEO, SIZE.x, SIZE.y, SIZE.width, SIZE.height);
@@ -47,8 +50,8 @@ function updateCanvas() {
     for(let i=0;i<PIECES.length;i++) {
         PIECES[i].draw(CONTEXT);
     }
-
-    window.requestAnimationFrame(updateCanvas);
+    updateTime();
+    window.requestAnimationFrame(updateGame);
 }
 
 function initializePieces(rows, columns) {
@@ -110,8 +113,10 @@ function onMouseMove(e) {
         SELECTED_PIECE.y=e.y-SELECTED_PIECE.offset.y;
     }
 }
+
 function onMouseUp() {
-    if(SELECTED_PIECE.isClose()) {
+
+    if(SELECTED_PIECE != null && SELECTED_PIECE.isClose()) {
         SELECTED_PIECE.snap();
     }
     SELECTED_PIECE=null;
@@ -124,6 +129,7 @@ function onTouchStart(e) {
     }
     onMouseDown(loc);
 }
+
 function onTouchMove(e) {
     let loc={
         x:e.touches[0].clientX,
@@ -131,11 +137,11 @@ function onTouchMove(e) {
     }
     onMouseMove(loc);
 }
+
 function onTouchEnd(e) {
 
     onMouseUp();
 }
-
 
 class Piece {
     constructor(rowIndex,collIndex) {
@@ -175,6 +181,41 @@ class Piece {
         this.y=this.yCorrect;
     }
 }
+
 function distance(p1,p2) {
     return Math.sqrt((p1.x-p2.x)*(p1.x-p2.x)+(p1.y-p2.y)*(p1.y-p2.y))
 }
+
+// game function
+
+function setDifficulty() {
+    let diff=document.getElementById("difficulty").value;
+    switch (diff) {
+        case '0': initializePieces(3,3); break;
+        case '1': initializePieces(5,5); break;
+        case '2': initializePieces(10,10); break;
+        case '3': initializePieces(40,25); break;
+    }
+}
+
+function restart() {
+    START_TIME= new Date().getTime();
+    END_TIME= null;
+    randomizePieces();
+    updateTime();
+}
+
+function updateTime() {
+    let now= new Date().getTime();
+    if(START_TIME !=null) {
+        document.getElementById("time").innerHTML=formatTime(now - START_TIME);
+    }
+}
+
+function formatTime(ms) {
+    let seconds= Math.floor(ms / 1000);
+    let s= Math.floor(seconds % 60);
+    let m= Math.floor((seconds % (3600)) /60);
+    let h= Math.floor((seconds % (3600 * 24))/3600);
+    return finaltTime= h.toString().padStart(2, '0')+':'+m.toString().padStart(2, '0')+':'+s.toString().padStart(2, '0')
+;}

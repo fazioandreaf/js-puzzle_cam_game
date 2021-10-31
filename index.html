@@ -9,7 +9,21 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body onload="main()">
-    <canvas id="myCanvas"></canvas>
-    
+    <div class="game">
+        <canvas id="myCanvas"></canvas>
+        <div class="menu">
+            <div class="controlls">
+                Difficult
+                <select id="difficulty" onchange="setDifficulty()">
+                    <option value='0' >easy</option>
+                    <option value='1' >medium</option>
+                    <option value='2' >hard</option>
+                    <option value='3' >insane</option>
+                </select>
+                <button onclick="restart()">Start</button>
+                <div id="time"></div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
