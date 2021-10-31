@@ -73,7 +73,6 @@ function randomizePieces() {
         }
             PIECES[i].x=loc.x;
             PIECES[i].y=loc.y;
-            PIECES[i].correct= false;
     }
 }
 
@@ -102,14 +101,12 @@ function onMouseDown(e) {
             PIECES.splice(index,1);
             PIECES.push(SELECTED_PIECE);
         }
-        SELECTED_PIECE.offset= {
+        SELECTED_PIECE.offset={
             x:e.x-SELECTED_PIECE.x,
             y:e.y-SELECTED_PIECE.y,
         }
-        SELECTED_PIECE.correct= false;
     }
 }
-
 function onMouseMove(e) {
     if(SELECTED_PIECE != null) {
         SELECTED_PIECE.x=e.x-SELECTED_PIECE.offset.x;
@@ -118,12 +115,9 @@ function onMouseMove(e) {
 }
 
 function onMouseUp() {
-    if (SELECTED_PIECE != null && SELECTED_PIECE.isClose()) {
+
+    if(SELECTED_PIECE != null && SELECTED_PIECE.isClose()) {
         SELECTED_PIECE.snap();
-        if (isComplete() && END_TIME == null) {
-            let now= new Date().getTime();
-            END_TIME= now;
-        }
     }
     SELECTED_PIECE=null;
 }
@@ -151,15 +145,14 @@ function onTouchEnd(e) {
 
 class Piece {
     constructor(rowIndex,collIndex) {
-        this.rowIndex= rowIndex;
-        this.collIndex= collIndex;
-        this.x= SIZE.x+SIZE.width*this.collIndex/SIZE.columns;
-        this.y= SIZE.y+SIZE.height*this.rowIndex/SIZE.rows;
-        this.width= SIZE.width/SIZE.columns;
-        this.height= SIZE.height/SIZE.rows;
-        this.xCorrect= this.x,
-        this.yCorrect= this.y,
-        this.correct= true;
+        this.rowIndex=rowIndex;
+        this.collIndex=collIndex;
+        this.x=SIZE.x+SIZE.width*this.collIndex/SIZE.columns;
+        this.y=SIZE.y+SIZE.height*this.rowIndex/SIZE.rows;
+        this.width=SIZE.width/SIZE.columns;
+        this.height=SIZE.height/SIZE.rows;
+        this.xCorrect=this.x,
+        this.yCorrect=this.y
     }
 
     draw(context) {
@@ -177,18 +170,15 @@ class Piece {
         context.rect(this.x, this.y, this.width, this.height);
         context.stroke();
     }
-
     isClose() {
         if(distance({x:this.x, y:this.y},{x:this.xCorrect, y:this.yCorrect})< this.width/3) {
             return true;
         }
         return false;
     }
-
     snap() {
         this.x=this.xCorrect;
         this.y=this.yCorrect;
-        this.correct= true
     }
 }
 
@@ -217,12 +207,8 @@ function restart() {
 
 function updateTime() {
     let now= new Date().getTime();
-    if(START_TIME != null) {
-        if(END_TIME != null) {
-            document.getElementById("time").innerHTML=formatTime(END_TIME - START_TIME);
-        } else {
-            document.getElementById("time").innerHTML=formatTime(now - START_TIME);
-        }
+    if(START_TIME !=null) {
+        document.getElementById("time").innerHTML=formatTime(now - START_TIME);
     }
 }
 
@@ -232,13 +218,4 @@ function formatTime(ms) {
     let m= Math.floor((seconds % (3600)) /60);
     let h= Math.floor((seconds % (3600 * 24))/3600);
     return finaltTime= h.toString().padStart(2, '0')+':'+m.toString().padStart(2, '0')+':'+s.toString().padStart(2, '0')
-}
-
-function isComplete() {
-    for(let i=0; i<PIECES.length; i++) {
-        if(PIECES[i].correct == false) {
-            return false
-        }
-    }
-    return true
-}
+;}
