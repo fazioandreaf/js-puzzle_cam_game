@@ -103,6 +103,9 @@ function onMouseMove(e) {
     }
 }
 function onMouseUp(e) {
+    if(SELECTED_PIECE.isClose()) {
+        SELECTED_PIECE.snap();
+    }
     SELECTED_PIECE=null;
 }
 
@@ -115,6 +118,8 @@ class Piece {
         this.y=SIZE.y+SIZE.height*this.rowIndex/SIZE.rows;
         this.width=SIZE.width/SIZE.columns;
         this.height=SIZE.height/SIZE.rows;
+        this.xCorrect=this.x,
+        this.yCorrect=this.y
     }
 
     draw(context) {
@@ -127,8 +132,22 @@ class Piece {
             this.x, 
             this.y, 
             this.width, 
-            this.height)
+            this.height
+            )
         context.rect(this.x, this.y, this.width, this.height);
         context.stroke();
     }
+    isClose() {
+        if(distance({x:this.x, y:this.y},{x:this.xCorrect, y:this.yCorrect})< this.width/3) {
+            return true;
+        }
+        return false;
+    }
+    snap() {
+        this.x=this.xCorrect;
+        this.y=this.yCorrect;
+    }
+}
+function distance(p1,p2) {
+    return Math.sqrt((p1.x-p2.x)*(p1.x-p2.x)+(p1.y-p2.y)*(p1.y-p2.y))
 }
