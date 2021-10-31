@@ -73,23 +73,31 @@ function randomizePieces() {
     }
 }
 
-function addEventListeners() {
-    CANVAS.addEventListener('mousedown', onMouseDown);
-    CANVAS.addEventListener('mousemove', onMouseMove);
-    CANVAS.addEventListener('mouseup', onMouseUp);
-}
-
 function getPressedPiece(loc) {
-    for(let i=0; i<PIECES.length; i++) {
+    for(let i=PIECES.length-1; i>=0; i--) {
         if((loc.x>PIECES[i].x && loc.x<(PIECES[i].x+PIECES[i].width)) && (loc.y>PIECES[i].y && loc.y<(PIECES[i].y+PIECES[i].height)))
         return PIECES[i];
     }
     return null;
 }
 
+function addEventListeners() {
+    CANVAS.addEventListener('mousedown', onMouseDown);
+    CANVAS.addEventListener('mousemove', onMouseMove);
+    CANVAS.addEventListener('mouseup', onMouseUp);
+    CANVAS.addEventListener('touchstart', onTouchStart);
+    CANVAS.addEventListener('touchmove', onTouchMove);
+    CANVAS.addEventListener('touchend', onTouchEnd);    
+}
+
 function onMouseDown(e) {
     SELECTED_PIECE=getPressedPiece(e);
     if(SELECTED_PIECE != null) {
+        const index=PIECES.indexOf(SELECTED_PIECE);
+        if (index>-1) {
+            PIECES.splice(index,1);
+            PIECES.push(SELECTED_PIECE);
+        }
         SELECTED_PIECE.offset={
             x:e.x-SELECTED_PIECE.x,
             y:e.y-SELECTED_PIECE.y,
@@ -102,11 +110,30 @@ function onMouseMove(e) {
         SELECTED_PIECE.y=e.y-SELECTED_PIECE.offset.y;
     }
 }
-function onMouseUp(e) {
+function onMouseUp() {
     if(SELECTED_PIECE.isClose()) {
         SELECTED_PIECE.snap();
     }
     SELECTED_PIECE=null;
+}
+
+function onTouchStart(e) {
+    let loc={
+        x:e.touches[0].clientX,
+        y:e.touches[0].clientY,
+    }
+    onMouseDown(loc);
+}
+function onTouchMove(e) {
+    let loc={
+        x:e.touches[0].clientX,
+        y:e.touches[0].clientY,
+    }
+    onMouseMove(loc);
+}
+function onTouchEnd(e) {
+
+    onMouseUp();
 }
 
 
